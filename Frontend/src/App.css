@@ -1,0 +1,245 @@
+/* ===== GLOBAL LAYOUT ===== */
+/* Page layout */
+/* Make full viewport height */
+html, body, #root {
+  height: 100%;
+  margin: 0;
+}
+
+/* Flex layout for App */
+.app-container {
+  min-height: 100vh; /* full screen */
+  display: flex;
+  flex-direction: column;
+}
+
+/* Main content grows to push footer down */
+.main-content {
+  flex: 1;
+  padding: 20px; /* optional */
+}
+
+/* Footer style */
+.footer {
+  height: 60px;
+  background-color: #0b2e61; /* your color */
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ===== NAVBAR ===== */
+nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #0d2b52;
+  padding: 14px 30px;
+}
+
+nav > div {
+  display: flex;
+  align-items: center;
+}
+
+nav a {
+  color: #ffffff;
+  text-decoration: none;
+  margin-right: 18px;
+  font-weight: 500;
+  font-size: 15px;
+}
+
+nav a:hover {
+  text-decoration: underline;
+}
+
+nav button {
+  background-color: #ffffff;
+  color: #0d2b52;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+nav button:hover {
+  background-color: #e6e6e6;
+}
+
+/* Mobile navbar */
+@media (max-width: 600px) {
+  nav {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  nav a {
+    margin-right: 12px;
+  }
+}
+
+/* ===== HOME HERO ===== */
+.home-hero {
+  min-height: calc(100vh - 70px);
+  background-image: linear-gradient(
+      rgba(0, 0, 0, 0.6),
+      rgba(0, 0, 0, 0.6)
+    ),
+    url("https://images.unsplash.com/photo-1515378791036-0648a3ef77b2");
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.home-overlay {
+  text-align: center;
+  color: #ffffff;
+  max-width: 700px;
+  padding: 20px;
+}
+
+.home-badge {
+  display: inline-block;
+  background: #0d2b52;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  margin-bottom: 15px;
+}
+
+.home-overlay h1 {
+  font-size: 48px;
+  margin-bottom: 15px;
+}
+
+.home-overlay p {
+  font-size: 18px;
+  line-height: 1.6;
+  margin-bottom: 25px;
+  color: #e6e6e6;
+}
+
+.home-btn {
+  background-color: #ffffff;
+  color: #0d2b52;
+  padding: 12px 26px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.home-btn:hover {
+  background-color: #e6e6e6;
+}
+
+/* ===== BLOG LIST ===== */
+.blogs-container {
+  max-width: 1100px;
+  margin: auto;
+  padding: 20px;
+}
+
+.blogs-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 25px;
+}
+
+.blog-card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+  padding: 15px;
+}
+
+.blog-card img {
+  width: 100%;
+  border-radius: 10px;
+}
+
+/* ===== BLOG DETAILS ===== */
+.blog-details {
+  max-width: 900px;
+  margin: auto;
+  padding: 25px;
+  padding-bottom: 50px; /* ensures buttons visible */
+}
+
+.blog-details img {
+  width: 100%;
+  max-height: 450px;
+  object-fit: cover;
+  border-radius: 12px;
+  margin: 20px 0;
+}
+
+.blog-full-content {
+  font-size: 17px;
+  line-height: 1.8;
+}
+
+.blog-thoughts {
+  margin-top: 30px;
+  padding: 15px;
+  background: #f5f7fa;
+  border-left: 5px solid #0d2b52;
+}
+
+/* ===== MOBILE ===== */
+@media (max-width: 768px) {
+  .blogs-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .home-overlay h1 {
+    font-size: 34px;
+  }
+}
+.form-container {
+  max-width: 400px;
+  margin: 50px auto; /* center vertically */
+  padding: 30px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+  font-weight: bold;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1); /* subtle shadow */
+}
+
+/* Inputs and textareas */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+textarea {
+  width: 100%;
+  padding: 10px 12px;
+  margin: 8px 0 15px 0;
+  font-size: 1em;
+  font-family: inherit;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-sizing: border-box;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+/* Focus state */
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
+textarea:focus {
+  border-color: #0077ff;
+  box-shadow: 0 0 5px rgba(0, 119, 255, 0.5);
+  outline: none;
+}
+
+/* Optional placeholder style */
+::placeholder {
+  color: #aaa;
+  font-style: italic;
+}
