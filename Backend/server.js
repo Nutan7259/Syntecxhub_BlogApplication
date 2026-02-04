@@ -22,7 +22,7 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// 🔥 BULLETPROOF CORS (local + production)
+// 🔥 BULLETPROOF CORS
 const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:3000",
@@ -32,21 +32,18 @@ const allowedOrigins = [
 
 app.use((req, res, next) => {
   const origin = req.headers.origin;
+
   if (allowedOrigins.includes(origin)) {
     res.header("Access-Control-Allow-Origin", origin);
   }
 
-  res.header(
-    "Access-Control-Allow-Methods",
-    "GET,POST,PUT,DELETE,OPTIONS"
-  );
-  res.header(
-    "Access-Control-Allow-Headers",
-    "Content-Type, Authorization"
-  );
+  res.header("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  res.header("Access-Control-Allow-Credentials", "true");
 
   if (req.method === "OPTIONS") {
-    return res.sendStatus(200); // Preflight request handled
+    console.log(`⚡ Preflight request from origin: ${origin}`);
+    return res.sendStatus(200); // Handle preflight requests
   }
 
   next();
@@ -150,7 +147,7 @@ app.post("/api/register", async (req, res) => {
 
     res.json({ message: "Registered successfully" });
   } catch (err) {
-    console.error("REGISTER ERROR FULL:", err); // <-- log full error
+    console.error("REGISTER ERROR FULL:", err); // full error logged
     res.status(500).json({
       message:
         err.code === 11000
@@ -197,7 +194,8 @@ app.post(
         author: req.user.id,
       });
       res.json(blog);
-    } catch {
+    } catch (err) {
+      console.error("BLOG CREATE ERROR:", err);
       res.status(500).json({ message: "Blog creation failed" });
     }
   }
@@ -236,7 +234,8 @@ app.post("/api/blogs/:id/summary", async (req, res) => {
     });
 
     res.json({ summary: response.choices[0].message.content });
-  } catch {
+  } catch (err) {
+    console.error("AI SUMMARY ERROR:", err);
     res.status(500).json({ message: "AI summary failed" });
   }
 });
