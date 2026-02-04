@@ -3,6 +3,8 @@ import axios from "axios";
 import { AuthContext } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 const Register = () => {
   const [form, setForm] = useState({ name: "", email: "", password: "" });
   const { login } = useContext(AuthContext);
@@ -13,12 +15,13 @@ const Register = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    try {
-      // Direct call to backend
-      await axios.post("http://localhost:5000/api/register", form);
 
-      // Login immediately
-      const res = await axios.post("http://localhost:5000/api/login", {
+    try {
+      // REGISTER
+      await axios.post(`${API_URL}/api/register`, form);
+
+      // LOGIN
+      const res = await axios.post(`${API_URL}/api/login`, {
         email: form.email,
         password: form.password,
       });
@@ -26,7 +29,7 @@ const Register = () => {
       login(res.data.user, res.data.token);
       navigate("/blogs");
     } catch (err) {
-      console.log(err.response?.data || err.message);
+      console.error(err);
       alert(err.response?.data?.message || "Error registering user");
     }
   };
@@ -35,12 +38,15 @@ const Register = () => {
     <div className="form-container">
       <h2>Register</h2>
       <form onSubmit={handleSubmit}>
-        <label>Name:</label><br></br>
-        <input name="name" placeholder="Name" onChange={handleChange} required /><br></br><br></br>
+        <label>Name:</label>
+        <input name="name" onChange={handleChange} required />
+
         <label>Email:</label>
-        <input name="email" type="email" placeholder="Email" onChange={handleChange} required /><br></br><br></br>
+        <input name="email" type="email" onChange={handleChange} required />
+
         <label>Password:</label>
-        <input name="password" type="password" placeholder="Password" onChange={handleChange} required /><br></br><br></br>
+        <input name="password" type="password" onChange={handleChange} required />
+
         <button type="submit">Register</button>
       </form>
     </div>
