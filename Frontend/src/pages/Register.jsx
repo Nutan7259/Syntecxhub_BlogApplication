@@ -3,7 +3,6 @@ import axios from "axios";
 import { AuthContext } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 
-// ✅ MUST be set in Vercel
 const API_URL = import.meta.env.VITE_API_URL;
 
 const Register = () => {
@@ -22,34 +21,19 @@ const Register = () => {
       return;
     }
 
-    if (!form.name || !form.email || !form.password) {
-      alert("All fields are required");
-      return;
-    }
-
     try {
-      // REGISTER
-      await axios.post(
-        `${API_URL}/api/register`,
-        form,
-        { headers: { "Content-Type": "application/json" } }
-      );
+      await axios.post(`${API_URL}/api/register`, form);
 
-      // LOGIN
-      const res = await axios.post(
-        `${API_URL}/api/login`,
-        {
-          email: form.email,
-          password: form.password,
-        },
-        { headers: { "Content-Type": "application/json" } }
-      );
+      const res = await axios.post(`${API_URL}/api/login`, {
+        email: form.email,
+        password: form.password,
+      });
 
       login(res.data.user, res.data.token);
       navigate("/blogs");
     } catch (err) {
-      console.error("Register error:", err.response?.data || err.message);
-      alert(err.response?.data?.message || "Error registering user");
+      console.error("REGISTER ERROR:", err.response?.data || err.message);
+      alert(err.response?.data?.message || "Registration failed");
     }
   };
 
@@ -57,15 +41,9 @@ const Register = () => {
     <div className="form-container">
       <h2>Register</h2>
       <form onSubmit={handleSubmit}>
-        <label>Name:</label>
-        <input name="name" onChange={handleChange} required />
-
-        <label>Email:</label>
-        <input name="email" type="email" onChange={handleChange} required />
-
-        <label>Password:</label>
-        <input name="password" type="password" onChange={handleChange} required />
-
+        <input name="name" placeholder="Name" onChange={handleChange} required />
+        <input name="email" type="email" placeholder="Email" onChange={handleChange} required />
+        <input name="password" type="password" placeholder="Password" onChange={handleChange} required />
         <button type="submit">Register</button>
       </form>
     </div>
