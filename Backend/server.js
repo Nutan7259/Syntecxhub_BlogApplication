@@ -7,8 +7,6 @@ const multer = require("multer");
 const path = require("path");
 const OpenAI = require("openai");
 
-const app = express();
-
 /* ================= CONFIG ================= */
 const JWT_SECRET = process.env.JWT_SECRET;
 
@@ -17,16 +15,19 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY || "",
 });
 
+/* ================= APP ================= */
+const app = express();
+
 /* ================= MIDDLEWARE ================= */
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// 🔥 MANUAL CORS FIX (works on Render & handles preflight)
+// 🔥 MANUAL CORS FIX
 app.use((req, res, next) => {
   res.header(
     "Access-Control-Allow-Origin",
     "https://syntecxhub-blog-application.vercel.app"
-  ); // change to your frontend
+  ); // Replace with your frontend URL
   res.header(
     "Access-Control-Allow-Methods",
     "GET,POST,PUT,DELETE,OPTIONS"
@@ -37,7 +38,7 @@ app.use((req, res, next) => {
   );
 
   if (req.method === "OPTIONS") {
-    return res.sendStatus(200);
+    return res.sendStatus(200); // Handle preflight requests
   }
 
   next();
@@ -125,7 +126,6 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 /* ================= AUTH ROUTES ================= */
-
 // REGISTER
 app.post("/api/register", async (req, res) => {
   try {
@@ -179,7 +179,6 @@ app.post("/api/login", async (req, res) => {
 });
 
 /* ================= BLOG ROUTES ================= */
-
 // CREATE BLOG
 app.post(
   "/api/blogs",
