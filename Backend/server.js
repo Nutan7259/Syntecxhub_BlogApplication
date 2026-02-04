@@ -22,12 +22,20 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// 🔥 MANUAL CORS FIX
+// 🔥 BULLETPROOF CORS (local + production)
+const allowedOrigins = [
+  "http://localhost:5173",
+  "http://localhost:3000",
+  "https://syntecxhub-blog-application.vercel.app",
+  "https://syntecxhub-blog-application-5o67.vercel.app",
+];
+
 app.use((req, res, next) => {
-  res.header(
-    "Access-Control-Allow-Origin",
-    "https://syntecxhub-blog-application.vercel.app"
-  ); // Replace with your frontend URL
+  const origin = req.headers.origin;
+  if (allowedOrigins.includes(origin)) {
+    res.header("Access-Control-Allow-Origin", origin);
+  }
+
   res.header(
     "Access-Control-Allow-Methods",
     "GET,POST,PUT,DELETE,OPTIONS"
@@ -38,7 +46,7 @@ app.use((req, res, next) => {
   );
 
   if (req.method === "OPTIONS") {
-    return res.sendStatus(200); // Handle preflight requests
+    return res.sendStatus(200); // Preflight request handled
   }
 
   next();
