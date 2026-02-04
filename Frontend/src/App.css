@@ -1,32 +1,32 @@
 /* ===== GLOBAL LAYOUT ===== */
-/* Page layout */
-/* Make full viewport height */
 html, body, #root {
   height: 100%;
   margin: 0;
 }
 
-/* Flex layout for App */
+* {
+  box-sizing: border-box;
+}
+
 .app-container {
-  min-height: 100vh; /* full screen */
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
 }
 
-/* Main content grows to push footer down */
 .main-content {
   flex: 1;
-  padding: 20px; /* optional */
+  padding: 20px;
 }
 
-/* Footer style */
+/* ===== FOOTER ===== */
 .footer {
-  height: 60px;
-  background-color: #0b2e61; /* your color */
+  background-color: #0b2e61;
   color: white;
   display: flex;
   align-items: center;
   justify-content: center;
+  height: 60px;
 }
 
 /* ===== NAVBAR ===== */
@@ -36,17 +36,19 @@ nav {
   align-items: center;
   background-color: #0d2b52;
   padding: 14px 30px;
+  flex-wrap: wrap;
 }
 
 nav > div {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
 }
 
 nav a {
   color: #ffffff;
   text-decoration: none;
-  margin-right: 18px;
+  margin: 6px 14px;
   font-weight: 500;
   font-size: 15px;
 }
@@ -59,7 +61,7 @@ nav button {
   background-color: #ffffff;
   color: #0d2b52;
   border: none;
-  padding: 6px 14px;
+  padding: 8px 16px;
   border-radius: 6px;
   cursor: pointer;
   font-weight: 600;
@@ -67,18 +69,6 @@ nav button {
 
 nav button:hover {
   background-color: #e6e6e6;
-}
-
-/* Mobile navbar */
-@media (max-width: 600px) {
-  nav {
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  nav a {
-    margin-right: 12px;
-  }
 }
 
 /* ===== HOME HERO ===== */
@@ -94,13 +84,13 @@ nav button:hover {
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 20px;
 }
 
 .home-overlay {
   text-align: center;
   color: #ffffff;
   max-width: 700px;
-  padding: 20px;
 }
 
 .home-badge {
@@ -134,10 +124,6 @@ nav button:hover {
   text-decoration: none;
 }
 
-.home-btn:hover {
-  background-color: #e6e6e6;
-}
-
 /* ===== BLOG LIST ===== */
 .blogs-container {
   max-width: 1100px;
@@ -152,7 +138,7 @@ nav button:hover {
 }
 
 .blog-card {
-  background: #fff;
+  background: #ffffff;
   border-radius: 12px;
   box-shadow: 0 6px 18px rgba(0,0,0,0.12);
   padding: 15px;
@@ -168,7 +154,6 @@ nav button:hover {
   max-width: 900px;
   margin: auto;
   padding: 25px;
-  padding-bottom: 50px; /* ensures buttons visible */
 }
 
 .blog-details img {
@@ -191,55 +176,76 @@ nav button:hover {
   border-left: 5px solid #0d2b52;
 }
 
-/* ===== MOBILE ===== */
-@media (max-width: 768px) {
-  .blogs-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .home-overlay h1 {
-    font-size: 34px;
-  }
-}
+/* ===== FORMS ===== */
 .form-container {
   max-width: 400px;
-  margin: 50px auto; /* center vertically */
+  margin: 50px auto;
   padding: 30px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
   background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
   font-weight: bold;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1); /* subtle shadow */
 }
 
-/* Inputs and textareas */
-input[type="text"],
-input[type="email"],
-input[type="password"],
+input,
 textarea {
   width: 100%;
   padding: 10px 12px;
-  margin: 8px 0 15px 0;
+  margin-bottom: 15px;
   font-size: 1em;
-  font-family: inherit;
   border: 1px solid #ccc;
   border-radius: 5px;
-  box-sizing: border-box;
-  transition: border-color 0.3s, box-shadow 0.3s;
 }
 
-/* Focus state */
-input[type="text"]:focus,
-input[type="email"]:focus,
-input[type="password"]:focus,
+input:focus,
 textarea:focus {
   border-color: #0077ff;
   box-shadow: 0 0 5px rgba(0, 119, 255, 0.5);
   outline: none;
 }
 
-/* Optional placeholder style */
-::placeholder {
-  color: #aaa;
-  font-style: italic;
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .blogs-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .home-overlay h1 {
+    font-size: 32px;
+  }
+
+  .home-overlay p {
+    font-size: 16px;
+  }
+
+  nav {
+    justify-content: center;
+    text-align: center;
+  }
+
+  nav button {
+    width: 100%;
+    margin-top: 10px;
+  }
+
+  .blog-details {
+    padding: 15px;
+  }
+
+  .blog-details img {
+    max-height: 260px;
+  }
+}
+
+@media (max-width: 480px) {
+  .form-container {
+    margin: 30px 15px;
+    padding: 20px;
+  }
+
+  .footer {
+    height: auto;
+    padding: 15px;
+    font-size: 14px;
+  }
 }
