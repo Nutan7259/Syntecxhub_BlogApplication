@@ -10,43 +10,53 @@ const OpenAI = require("openai");
 
 const app = express();
 
-/* CONFIG */
+/* ================= CONFIG ================= */
 const JWT_SECRET = process.env.JWT_SECRET;
 
-/* OPENAI */
+/* ================= OPENAI (optional) ================= */
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
+  apiKey: process.env.OPENAI_API_KEY || "",
 });
 
-/* MIDDLEWARE */
+/* ================= MIDDLEWARE ================= */
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use(
   cors({
-    origin: true,
+    origin: [
+      "http://localhost:5173",
+      "http://localhost:3000",
+      "https://syntecxhub-blog-application.vercel.app",
+      "https://syntecxhub-blog-application-5o67.vercel.app",
+    ],
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
   })
 );
 
 app.options("*", cors());
-
-
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-/* ROOT ROUTE */
+/* ================= ROOT ================= */
 app.get("/", (req, res) => {
   res.send("🚀 Life Story Blog Backend Running");
 });
 
-/* DB CONNECTION */
+/* ================= DB CONNECTION ================= */
 mongoose
-  .connect(process.env.MONGO_URI)
-  .then(() => console.log("MongoDB Connected"))
-  .catch((err) => console.error("MongoDB Error:", err));
+  .connect(process.env.MONGO_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  .then(() => console.log("✅ MongoDB Connected"))
+  .catch((err) => {
+    console.error("❌ MongoDB Connection Failed:", err.message);
+    process.exit(1);
+  });
 
-/* USER SCHEMA */
+/* ================= SCHEMAS ================= */
 const userSchema = new mongoose.Schema({
   name: String,
   email: { type: String, unique: true },
@@ -55,7 +65,6 @@ const userSchema = new mongoose.Schema({
 });
 const User = mongoose.model("User", userSchema);
 
-/* BLOG SCHEMA */
 const blogSchema = new mongoose.Schema(
   {
     title: String,
@@ -72,7 +81,6 @@ const blogSchema = new mongoose.Schema(
 );
 const Blog = mongoose.model("Blog", blogSchema);
 
-/* COMMENT SCHEMA */
 const commentSchema = new mongoose.Schema(
   {
     text: String,
@@ -83,7 +91,7 @@ const commentSchema = new mongoose.Schema(
 );
 const Comment = mongoose.model("Comment", commentSchema);
 
-/* AUTH MIDDLEWARE */
+/* ================= AUTH MIDDLEWARE ================= */
 const authMiddleware = (req, res, next) => {
   const authHeader = req.headers.authorization;
   if (!authHeader)
@@ -95,12 +103,12 @@ const authMiddleware = (req, res, next) => {
     const decoded = jwt.verify(token, JWT_SECRET);
     req.user = decoded;
     next();
-  } catch (err) {
+  } catch {
     res.status(401).json({ message: "Invalid token" });
   }
 };
 
-/* IMAGE UPLOAD */
+/* ================= IMAGE UPLOAD ================= */
 const storage = multer.diskStorage({
   destination: "uploads/",
   filename: (req, file, cb) => {
@@ -109,7 +117,7 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
-/* AUTH ROUTES */
+/* ================= AUTH ROUTES ================= */
 
 // REGISTER
 app.post("/api/register", async (req, res) => {
@@ -130,8 +138,13 @@ app.post("/api/register", async (req, res) => {
 
     res.json({ message: "Registered successfully" });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Registration failed" });
+    console.error("REGISTER ERROR:", err);
+    res.status(500).json({
+      message:
+        err.code === 11000
+          ? "Email already registered"
+          : "Registration failed",
+    });
   }
 });
 
@@ -157,28 +170,33 @@ app.post("/api/login", async (req, res) => {
       user: { id: user._id, name: user.name, email: user.email },
     });
   } catch (err) {
-    console.error(err);
+    console.error("LOGIN ERROR:", err);
     res.status(500).json({ message: "Login failed" });
   }
 });
 
-/* BLOG ROUTES */
+/* ================= BLOG ROUTES ================= */
 
 // CREATE BLOG
-app.post("/api/blogs", authMiddleware, upload.single("image"), async (req, res) => {
-  try {
-    const blog = await Blog.create({
-      ...req.body,
-      image: req.file ? req.file.filename : null,
-      author: req.user.id,
-    });
-    res.json(blog);
-  } catch (err) {
-    res.status(500).json({ message: "Blog creation failed" });
+app.post(
+  "/api/blogs",
+  authMiddleware,
+  upload.single("image"),
+  async (req, res) => {
+    try {
+      const blog = await Blog.create({
+        ...req.body,
+        image: req.file ? req.file.filename : null,
+        author: req.user.id,
+      });
+      res.json(blog);
+    } catch {
+      res.status(500).json({ message: "Blog creation failed" });
+    }
   }
-});
+);
 
-// GET ALL BLOGS
+// GET BLOGS
 app.get("/api/blogs", async (req, res) => {
   const blogs = await Blog.find().populate("author", "name");
   res.json(blogs);
@@ -194,29 +212,29 @@ app.get("/api/blogs/:id", async (req, res) => {
   res.json(blog);
 });
 
-/* AI SUMMARY (SAFE) */
+/* ================= AI SUMMARY (OPTIONAL) ================= */
 app.post("/api/blogs/:id/summary", async (req, res) => {
   try {
+    if (!process.env.OPENAI_API_KEY)
+      return res.status(400).json({ message: "AI not configured" });
+
     const blog = await Blog.findById(req.params.id);
     if (!blog) return res.status(404).json({ message: "Blog not found" });
 
     const response = await openai.chat.completions.create({
       model: "gpt-4o-mini",
       messages: [
-        {
-          role: "user",
-          content: `Summarize this blog:\n${blog.description}`,
-        },
+        { role: "user", content: `Summarize this blog:\n${blog.description}` },
       ],
     });
 
     res.json({ summary: response.choices[0].message.content });
-  } catch (err) {
+  } catch {
     res.status(500).json({ message: "AI summary failed" });
   }
 });
 
-/* SERVER */
+/* ================= SERVER ================= */
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () =>
   console.log(`🚀 Server running on port ${PORT}`)
