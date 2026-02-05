@@ -19,33 +19,28 @@ const CreateBlog = () => {
   const API_BASE = API_URL.endsWith("/") ? API_URL.slice(0, -1) : API_URL;
 
 const handleSubmit = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
+    try {
+      const formData = new FormData();
+      formData.append("title", title);
+      formData.append("description", description);
+      formData.append("thoughts", thoughts);
+      if (image) formData.append("image", image);
 
-  try {
-    const formData = new FormData();
-    formData.append("title", title);
-    formData.append("description", description);
-    formData.append("thoughts", thoughts);
-    if (image) formData.append("image", image);
+      // FIXED: Added "Bearer " prefix required by your server.js middleware
+      await axios.post(`${API_BASE}/api/blogs`, formData, {
+        headers: { 
+          Authorization: `Bearer ${token}`, 
+          "Content-Type": "multipart/form-data" 
+        },
+      });
 
-    if (!token) {
-      alert("Please login again");
-      return;
+      navigate("/blogs");
+    } catch (err) {
+      console.log(err.response?.data || err.message);
+      alert(err.response?.data?.message || "Error creating blog");
     }
-
-    await axios.post(`${API_BASE}/api/blogs`, formData, {
-      headers: {
-        Authorization: `Bearer ${token}`,   // ✅ FIX IS HERE
-        "Content-Type": "multipart/form-data",
-      },
-    });
-
-    navigate("/blogs");
-  } catch (err) {
-    console.log(err.response?.data || err.message);
-    alert("Error creating blog");
-  }
-};
+  };
 
 
   return (

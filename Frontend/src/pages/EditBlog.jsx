@@ -35,6 +35,7 @@ const EditBlog = () => {
   }, [id, API_BASE]);
 
   // 🔹 Update blog
+ // 🔹 Update blog
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -47,14 +48,15 @@ const EditBlog = () => {
     try {
       await axios.put(`${API_BASE}/api/blogs/${id}`, formData, {
         headers: {
-          Authorization: token,
+          // FIXED: Added "Bearer " prefix
+          Authorization: `Bearer ${token}`,
           "Content-Type": "multipart/form-data",
         },
       });
       navigate(`/blogs/${id}`);
     } catch (err) {
       console.error("Error updating blog:", err);
-      alert("Failed to update blog.");
+      alert(err.response?.data?.message || "Failed to update blog.");
     }
   };
 
