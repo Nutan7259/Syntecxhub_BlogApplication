@@ -5,7 +5,6 @@ import { useNavigate } from "react-router-dom";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 
-
 const CreateBlog = () => {
   const { token } = useContext(AuthContext);
   const navigate = useNavigate();
@@ -14,6 +13,10 @@ const CreateBlog = () => {
   const [description, setDescription] = useState("");
   const [thoughts, setThoughts] = useState("");
   const [image, setImage] = useState(null);
+
+  // Define dynamic API Base URL
+  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+  const API_BASE = API_URL.endsWith("/") ? API_URL.slice(0, -1) : API_URL;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -24,7 +27,8 @@ const CreateBlog = () => {
       formData.append("thoughts", thoughts);
       if (image) formData.append("image", image);
 
-      await axios.post("http://localhost:5000/api/blogs", formData, {
+      // Use API_BASE to route the request to Render instead of localhost
+      await axios.post(`${API_BASE}/api/blogs`, formData, {
         headers: { Authorization: token, "Content-Type": "multipart/form-data" },
       });
 

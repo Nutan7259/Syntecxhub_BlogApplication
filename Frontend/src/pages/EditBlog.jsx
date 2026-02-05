@@ -15,16 +15,24 @@ const EditBlog = () => {
   const [thoughts, setThoughts] = useState("");
   const [image, setImage] = useState(null);
 
+  // 🔹 Define dynamic API Base URL
+  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+  const API_BASE = API_URL.endsWith("/") ? API_URL.slice(0, -1) : API_URL;
+
   // 🔹 Load existing blog
   useEffect(() => {
     const fetchBlog = async () => {
-      const res = await axios.get(`http://localhost:5000/api/blogs/${id}`);
-      setTitle(res.data.title);
-      setDescription(res.data.description);
-      setThoughts(res.data.thoughts || "");
+      try {
+        const res = await axios.get(`${API_BASE}/api/blogs/${id}`);
+        setTitle(res.data.title);
+        setDescription(res.data.description);
+        setThoughts(res.data.thoughts || "");
+      } catch (err) {
+        console.error("Error fetching blog:", err);
+      }
     };
     fetchBlog();
-  }, [id]);
+  }, [id, API_BASE]);
 
   // 🔹 Update blog
   const handleSubmit = async (e) => {
@@ -36,21 +44,24 @@ const EditBlog = () => {
     formData.append("thoughts", thoughts);
     if (image) formData.append("image", image);
 
-    await axios.put(`http://localhost:5000/api/blogs/${id}`, formData, {
-      headers: {
-        Authorization: token,
-      },
-    });
-
-    navigate(`/blogs/${id}`);
+    try {
+      await axios.put(`${API_BASE}/api/blogs/${id}`, formData, {
+        headers: {
+          Authorization: token,
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      navigate(`/blogs/${id}`);
+    } catch (err) {
+      console.error("Error updating blog:", err);
+      alert("Failed to update blog.");
+    }
   };
 
   return (
     <div className="blog-details">
       <h1>Edit Blog</h1>
-
       <form onSubmit={handleSubmit}>
-        {/* Title */}
         <input
           type="text"
           placeholder="Blog Title"
@@ -58,29 +69,22 @@ const EditBlog = () => {
           onChange={(e) => setTitle(e.target.value)}
           required
         />
-
-        {/* Description (React-Quill Toolbar FIXED) */}
         <ReactQuill
           theme="snow"
           value={description}
           onChange={setDescription}
           placeholder="Write your story here..."
         />
-
-        {/* Thoughts */}
         <textarea
           placeholder="Your thoughts"
           value={thoughts}
           onChange={(e) => setThoughts(e.target.value)}
         />
-
-        {/* Image */}
         <input
           type="file"
           accept="image/*"
           onChange={(e) => setImage(e.target.files[0])}
         />
-
         <button type="submit">Update Blog</button>
       </form>
     </div>
@@ -88,4 +92,3 @@ const EditBlog = () => {
 };
 
 export default EditBlog;
-                                              

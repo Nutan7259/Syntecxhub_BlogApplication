@@ -9,17 +9,22 @@ const stripHtml = (html) => html.replace(/<[^>]*>?/gm, "");
 const Blogs = () => {
   const [blogs, setBlogs] = useState([]);
 
+  // Define dynamic API Base URL
+  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+  const API_BASE = API_URL.endsWith("/") ? API_URL.slice(0, -1) : API_URL;
+
   useEffect(() => {
     const fetchBlogs = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/blogs");
+        // Use the API_BASE variable here
+        const res = await axios.get(`${API_BASE}/api/blogs`);
         setBlogs(res.data);
       } catch (err) {
         console.log(err.response?.data || err.message);
       }
     };
     fetchBlogs();
-  }, []);
+  }, [API_BASE]); // Added API_BASE as a dependency
 
   return (
     <div className="blogs-container">
@@ -30,7 +35,8 @@ const Blogs = () => {
           <div key={blog._id} className="blog-card">
             {blog.image && (
               <img
-                src={`http://localhost:5000/uploads/${blog.image}`}
+                // Updated image source to use API_BASE
+                src={`${API_BASE}/uploads/${blog.image}`}
                 alt={blog.title}
               />
             )}

@@ -9,18 +9,22 @@ const BlogDetails = () => {
   const { user, token } = useContext(AuthContext);
   const [blog, setBlog] = useState(null);
 
+  // Define dynamic API Base URL
+  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+  const API_BASE = API_URL.endsWith("/") ? API_URL.slice(0, -1) : API_URL;
+
   useEffect(() => {
     axios
-      .get(`http://localhost:5000/api/blogs/${id}`)
+      .get(`${API_BASE}/api/blogs/${id}`)
       .then(res => setBlog(res.data))
       .catch(err => console.log(err));
-  }, [id]);
+  }, [id, API_BASE]); // Added API_BASE to dependency array
 
   const handleDelete = async () => {
     if (!window.confirm("Delete this blog?")) return;
 
     try {
-      await axios.delete(`http://localhost:5000/api/blogs/${id}`, {
+      await axios.delete(`${API_BASE}/api/blogs/${id}`, {
         headers: { Authorization: token },
       });
       navigate("/blogs");
@@ -44,7 +48,7 @@ const BlogDetails = () => {
 
       {blog.image && (
         <img
-          src={`http://localhost:5000/uploads/${blog.image}`}
+          src={`${API_BASE}/uploads/${blog.image}`}
           alt={blog.title}
         />
       )}
