@@ -132,20 +132,26 @@ app.post("/api/register", async (req, res) => {
     }
 
     const exists = await User.findOne({ email });
-    if (exists) return res.status(400).json({ message: "User already exists" });
+    if (exists) {
+      return res.status(400).json({ message: "User already exists" });
+    }
 
     const hash = await bcrypt.hash(password, 10);
-    await User.create({ name, email, password: hash });
+    const user = await User.create({ name, email, password: hash });
 
-    res.json({ message: "Registered successfully" });
+    res.json({ message: "Registered successfully", user });
   } catch (err) {
-    console.error("REGISTER ERROR FULL:", err);
+    console.error("REGISTER ERROR FULL:", err); // <-- Full error details
     res.status(500).json({
       message:
-        err.code === 11000 ? "Email already registered" : "Registration failed",
+        err.code === 11000
+          ? "Email already registered"
+          : "Registration failed",
+      error: err.message, // <-- Return actual DB error for debugging
     });
   }
 });
+
 
 // LOGIN
 app.post("/api/login", async (req, res) => {
