@@ -18,26 +18,35 @@ const CreateBlog = () => {
   const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
   const API_BASE = API_URL.endsWith("/") ? API_URL.slice(0, -1) : API_URL;
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const formData = new FormData();
-      formData.append("title", title);
-      formData.append("description", description);
-      formData.append("thoughts", thoughts);
-      if (image) formData.append("image", image);
+const handleSubmit = async (e) => {
+  e.preventDefault();
 
-      // Use API_BASE to route the request to Render instead of localhost
-      await axios.post(`${API_BASE}/api/blogs`, formData, {
-        headers: { Authorization: token, "Content-Type": "multipart/form-data" },
-      });
+  try {
+    const formData = new FormData();
+    formData.append("title", title);
+    formData.append("description", description);
+    formData.append("thoughts", thoughts);
+    if (image) formData.append("image", image);
 
-      navigate("/blogs");
-    } catch (err) {
-      console.log(err.response?.data || err.message);
-      alert("Error creating blog");
+    if (!token) {
+      alert("Please login again");
+      return;
     }
-  };
+
+    await axios.post(`${API_BASE}/api/blogs`, formData, {
+      headers: {
+        Authorization: `Bearer ${token}`,   // ✅ FIX IS HERE
+        "Content-Type": "multipart/form-data",
+      },
+    });
+
+    navigate("/blogs");
+  } catch (err) {
+    console.log(err.response?.data || err.message);
+    alert("Error creating blog");
+  }
+};
+
 
   return (
     <div className="form-container">
